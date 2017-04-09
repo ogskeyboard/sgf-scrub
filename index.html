@@ -1,0 +1,26 @@
+<html>
+<head>
+<title>SGF Go game record scrubber</title>
+<style>
+textarea {
+  width: 400px;
+  height: 200px;
+}
+</style>
+<script>
+  function scrub() {
+    var src = document.getElementById('toscrub');
+    var dst = document.getElementById('scrubbed');
+    
+    dst.value = src.value;
+  }
+</script>
+</head>
+<body>
+  <div>Copy/paste the text of the SGF file here, choose your options, and click scrub!</div>
+  <textarea id="toscrub" placeholder="Paste SGF contents here..."></textarea>
+  <button onclick="scrub" type="button>Scrub!</button>
+  <hr>
+  <textarea id="scrubbed" readonly placeholder="Click scrub above and your resulting SGF will show here..."></textarea>
+</body>
+</html>
