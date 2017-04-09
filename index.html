@@ -1,27 +1,85 @@
 <html>
+
 <head>
-<title>SGF Go game record scrubber</title>
-<style>
-textarea {
-  width: 400px;
-  height: 200px;
-}
-</style>
-<script>
-  function scrub() {
-    var src = document.getElementById('toscrub');
-    var dst = document.getElementById('scrubbed');
+  <title>SGF Go game record scrubber</title>
+  <style>
+    textarea {
+      width: 100%;
+      height: 200px;
+      margin-bottom: 5px;
+    }
     
-    dst.value = "TO-DO";
-  }
-</script>
+    .container {
+      width: 400px;
+      margin: 0 auto;
+    }
+    
+    .show {
+      display: block;
+    }
+    
+    .hide {
+      display: none;
+    }
+    
+    button {
+      display: block;
+      border: 1px solid #888;
+      background: #090;
+      color: white;
+      cursor: pointer;
+      height: 30px;
+      width: 100%;
+      margin-top: 5px;
+    }
+  </style>
+  <script>
+    function scrub() {
+      var src = document.getElementById('toscrub');
+      var dst = document.getElementById('scrubbed');
+
+      var w = document.getElementById('white').value;
+      var b = document.getElementById('black').value;
+      var d = document.getElementById('date').value;
+      w=(w=="")?"White":w;
+      b=(b=="")?"Black":b;
+      d=(d=="")?(new Date().toISOString()).substring(0,10):d;
+      
+      var t = src.value;
+      //replace stuff
+      t=t.replace(/DT\[(.)+\]/gm, "DT["+d+"]");
+      t=t.replace(/PC\[(.)+\]/gm, "PC[]");      
+      t=t.replace(/CP\[(.)+\]/gm, "CP[]");     
+      t=t.replace(/PW\[(.)+\]/gm, "PW["+w+"]");
+      t=t.replace(/PB\[(.)+\]/gm, "PB["+b+"]");
+      t=t.replace(/C\[(.)+\]/gm, "C[\n]");
+      t=t.replace(/C\[(.)+\n\]/gm, "C[\n]");
+      t=t.replace(/C\[[^\]]+\n\]\n/gm, "C[\n]");
+
+      dst.value = t;
+      document.getElementById('res').className = "show";
+      dst.select();
+      document.execCommand('copy');
+    }
+  </script>
 </head>
+
 <body>
-  <div>Copy/paste the text of the SGF file here, choose your options, and click scrub!</div>
-  <textarea id="toscrub" placeholder="Paste SGF contents here..."></textarea>
-  <br>
-  <button onclick="scrub" type="button">Scrub!</button>
-  <hr>
-  <textarea id="scrubbed" readonly placeholder="Click scrub above and your resulting SGF will show here..."></textarea>
+  <div class="container">
+    <h3>Scrub Identifying Information from SGF Record</h3>
+    <h4>Copy/paste the text of the SGF file here, choose your options, and click scrub! If you find something isn't getting scrubbed properly, open an issue here: <a href="https://github.com/ogskeyboard/sgf-scrub/issues">Issues </a></h4>
+    <textarea id="toscrub" placeholder="Paste SGF contents here..."></textarea>
+    <br>
+    <input id="white" type="text" value="" placeholder="White Player Name"></input>
+    <input id="black" type="text" value="" placeholder="Black Player Name"></input>
+    <br>Date (optional): <input id="date" type="date" value="" placeholder="Date (optional)"></input>
+    <button onclick="scrub()" type="button">Scrub!</button>
+    <div id="res" class="hide">
+      <hr>
+      <h5>Copied to clipboard!</h5>
+      <textarea id="scrubbed" readonly placeholder="Click scrub above and your resulting SGF will show here..."></textarea>
+    </div>
+  </div>
 </body>
+
 </html>
