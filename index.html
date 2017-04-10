@@ -32,6 +32,9 @@
       width: 100%;
       margin-top: 5px;
     }
+	button:hover {
+	  background: #0b0;
+	}
   </style>
   <script>
     function scrub() {
@@ -41,33 +44,73 @@
       var w = document.getElementById('white').value;
       var b = document.getElementById('black').value;
       var d = document.getElementById('date').value;
-      w=(w=="")?"White":w;
-      b=(b=="")?"Black":b;
-      d=(d=="")?(new Date().toISOString()).substring(0,10):d;
-      
+      w = (w == "") ? "White" : w;
+      b = (b == "") ? "Black" : b;
+      d = (d == "") ? (new Date().toISOString()).substring(0, 10) : d;
+
       var t = src.value;
       //replace stuff
-      t=t.replace(/DT\[(.)+\]/gm, "DT["+d+"]");
-      t=t.replace(/PC\[(.)+\]/gm, "PC[]");      
-      t=t.replace(/CP\[(.)+\]/gm, "CP[]");     
-      t=t.replace(/PW\[(.)+\]/gm, "PW["+w+"]");
-      t=t.replace(/PB\[(.)+\]/gm, "PB["+b+"]");
-      t=t.replace(/C\[(.)+\]/gm, "C[\n]");
-      t=t.replace(/C\[(.)+\n\]/gm, "C[\n]");
-      t=t.replace(/C\[[^\]]+\n\]\n/gm, "C[\n]");
+      t = t.replace(/DT\[(.)+\]/gm, "DT[" + d + "]");
+      t = t.replace(/PC\[(.)+\]/gm, "PC[]");
+      t = t.replace(/CP\[(.)+\]/gm, "CP[]");
+      t = t.replace(/PW\[(.)+\]/gm, "PW[" + w + "]");
+      t = t.replace(/PB\[(.)+\]/gm, "PB[" + b + "]");
+      t = t.replace(/C\[(.)+\]/gm, "C[\n]");
+      t = t.replace(/C\[(.)+\n\]/gm, "C[\n]");
+      t = t.replace(/C\[[^\]]+\n\]\n/gm, "C[\n]");
 
       dst.value = t;
       document.getElementById('res').className = "show";
       dst.select();
       document.execCommand('copy');
     }
+
+    function copy() {
+      var dst = document.getElementById('scrubbed');
+      dst.select();
+      document.execCommand('copy');
+    }
+
+    function loadFile(ev) {
+      var files = ev.target.files;
+      for (var i = 0, f; f = files[i]; i++) {
+        var reader = new FileReader();
+        reader.onload = (function (reader) {
+          return function () {
+            document.getElementById('toscrub').value = reader.result;
+          }
+        })(reader);
+        reader.readAsText(f)
+      }
+    }
+
+    function saveTextAsFile() {
+      var tx = document.getElementById("scrubbed").value;
+      var txb = new Blob([tx], { type: "text/plain" });
+      var txu = window.URL.createObjectURL(txb);
+      var fn = 'scrubbed-game.sgf';
+
+      var dl = document.createElement("a");
+      dl.download = fn;
+      dl.innerHTML = "Download File";
+      dl.href = txu;
+      dl.onclick = (function(ev){document.body.removeChild(ev.target);});
+      dl.style.display = "none";
+      document.body.appendChild(dl);
+      dl.click();
+    }
   </script>
 </head>
 
 <body>
   <div class="container">
-    <h3>Scrub Identifying Information from SGF Record</h3>
-    <h4>Copy/paste the text of the SGF file here, choose your options, and click scrub! If you find something isn't getting scrubbed properly, open an issue here: <a href="https://github.com/ogskeyboard/sgf-scrub/issues">Issues </a></h4>
+    <h3>Remove Identifying Information from SGF Record</h3>
+    <h4>Copy/paste the text of the SGF file here, choose your options, and click scrub!</h4>
+	<h5>This tool removes or replaces: comments, server/URLs, user names, and dates. If you find something isn't getting scrubbed
+      properly, open an issue <a href="https://github.com/ogskeyboard/sgf-scrub/issues">here. </a></h5>
+    Drag SGF File Here: <input id="file" type="file" placeholder="Drag SGF file here..."></input>
+    <br> - or -
+    <br>
     <textarea id="toscrub" placeholder="Paste SGF contents here..."></textarea>
     <br>
     <input id="white" type="text" value="" placeholder="White Player Name"></input>
@@ -76,10 +119,15 @@
     <button onclick="scrub()" type="button">Scrub!</button>
     <div id="res" class="hide">
       <hr>
-      <h5>Copied to clipboard!</h5>
-      <textarea id="scrubbed" readonly placeholder="Click scrub above and your resulting SGF will show here..."></textarea>
+      <h4>Scrubbed!</h4>
+      <textarea id="scrubbed" placeholder="Click scrub above and your resulting SGF will show here..."></textarea>
+      <br><button onclick="saveTextAsFile()">Save as File</button>
+      <br><button onclick="copy()">Copy to Clipboard</button>
     </div>
   </div>
+  <script>
+    document.getElementById('file').addEventListener('change', loadFile, false);
+  </script>
 </body>
 
 </html>
