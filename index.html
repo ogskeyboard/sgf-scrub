@@ -51,13 +51,20 @@
       var t = src.value;
       //replace stuff
       t = t.replace(/DT\[(.)+\]/gm, "DT[" + d + "]");
-      t = t.replace(/PC\[(.)+\]/gm, "PC[]");
+      t = t.replace(/PC\[(.)+\]/gm, "");
+      t = t.replace(/GC\[[^\]]+\]\n/gm, "");
+      t = t.replace(/GN\[(.)+\]/gm, "");
+      t = t.replace(/AP\[(.)+\]/gm, "");
+      t = t.replace(/SO\[(.)+\]/gm, "");
+      t = t.replace(/XM\[(.)+\]/gm, "");
       t = t.replace(/CP\[(.)+\]/gm, "CP[]");
       t = t.replace(/PW\[(.)+\]/gm, "PW[" + w + "]");
       t = t.replace(/PB\[(.)+\]/gm, "PB[" + b + "]");
-      t = t.replace(/C\[(.)+\]/gm, "C[\n]");
-      t = t.replace(/C\[(.)+\n\]/gm, "C[\n]");
-      t = t.replace(/C\[[^\]]+\n\]\n/gm, "C[\n]");
+      t = t.replace(/C\[(.)+\]/gm, "");
+      t = t.replace(/C\[(.)+\]/gm, "");
+      t = t.replace(/C\[[^\]]+\]\n/gm, "");
+      for (var i=0; i<100; i++)
+        t=t.replace(/\n\n/gm, "\n");
 
       dst.value = t;
       document.getElementById('res').className = "show";
